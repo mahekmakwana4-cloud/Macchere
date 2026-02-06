@@ -1,0 +1,1112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title></title>
+  <style>
+    :root{
+      --bg1:#0b1020; --bg2:#1b0f2a;
+      --card:#ffffff10; --card2:#ffffff14;
+      --text:#fff; --muted:#ffffffb3;
+      --accent:#ff4da6; --accent2:#7c5cff;
+      --good:#36d399; --bad:#ff6b6b;
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --radius: 22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:
+        radial-gradient(1200px 700px at 20% 10%, #ff4da620, transparent 60%),
+        radial-gradient(900px 600px at 85% 20%, #7c5cff22, transparent 60%),
+        radial-gradient(900px 700px at 50% 90%, #ff8bd822, transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      min-height:100vh; overflow-x:hidden;
+    }
+    .wrap{max-width:980px;margin:0 auto;padding:20px 16px 44px}
+    .topbar{
+      position:sticky;top:0;z-index:10;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(0,0,0,.45), rgba(0,0,0,.12));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:999px;padding:10px 14px;
+      box-shadow: var(--shadow);
+      display:flex;align-items:center;gap:10px;margin-bottom:18px;
+    }
+    .pill{
+      display:flex;gap:10px;align-items:center;
+      padding:8px 12px;border-radius:999px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.10);
+      font-size:13px;color:var(--muted);white-space:nowrap;
+    }
+    .bar{flex:1;height:10px;background:rgba(255,255,255,.10);border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.12)}
+    .bar>div{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:999px;transition:width .35s ease}
+
+    .btn{
+      border:none; cursor:pointer; user-select:none;
+      padding:12px 16px;border-radius:14px;
+      font-weight:800;color:white;
+      background: linear-gradient(90deg, var(--accent), #ff7bd5);
+      box-shadow: 0 14px 30px rgba(255,77,166,.22);
+      transition: transform .12s ease, filter .12s ease;
+    }
+    .btn:hover{transform:translateY(-1px);filter:brightness(1.03)}
+    .btn:active{transform:translateY(1px)}
+    .btn.secondary{background: rgba(255,255,255,.12); box-shadow:none;border:1px solid rgba(255,255,255,.14);font-weight:700}
+    .btn.good{ background: linear-gradient(90deg, var(--good), #7dffcf); color:#062217; box-shadow: 0 14px 30px rgba(54,211,153,.16); }
+    .btn.bad{ background: linear-gradient(90deg, var(--bad), #ff9b9b); color:#2a0707; box-shadow: 0 14px 30px rgba(255,107,107,.16); }
+    .btn:disabled{opacity:.45;cursor:not-allowed;transform:none;filter:none}
+
+    .card{
+      background: linear-gradient(180deg, var(--card), var(--card2));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:18px; position:relative; overflow:hidden;
+    }
+    .card::before{
+      content:""; position:absolute; inset:-2px; pointer-events:none;
+      background:
+        radial-gradient(800px 200px at 30% 0%, rgba(255,77,166,.20), transparent 60%),
+        radial-gradient(700px 220px at 80% 20%, rgba(124,92,255,.18), transparent 65%);
+    }
+    .card>*{position:relative;z-index:1}
+
+    h1{margin:8px 0 6px;font-size:30px;letter-spacing:-.6px}
+    h2{margin:6px 0 10px;font-size:22px;letter-spacing:-.3px}
+    p{margin:8px 0;color:var(--muted);line-height:1.5}
+    .tag{
+      display:inline-flex;gap:8px;align-items:center;
+      padding:6px 10px;border-radius:999px;
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.12);
+      color: var(--muted); font-size:12px;
+    }
+    .center{text-align:center}
+    .row{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+    .row.left{justify-content:flex-start}
+    .spacer{height:10px}
+    input[type="text"], textarea{
+      width:100%; padding:12px 12px; border-radius:14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18); color:white; outline:none; font-size:15px;
+    }
+    textarea{min-height:110px;resize:vertical}
+    .note{
+      padding:10px 12px;border-radius:14px;
+      background: rgba(255,255,255,.08);
+      border:1px dashed rgba(255,255,255,.18);
+      color: var(--muted); font-size:13px;
+    }
+    .q{
+      padding:12px 12px;border-radius:16px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .tiny{font-size:12px;color:var(--muted)}
+    .shake{animation:shake .28s ease}
+    @keyframes shake{
+      0%,100%{transform:translateX(0)}
+      25%{transform:translateX(-6px)}
+      75%{transform:translateX(6px)}
+    }
+    .footerBtns{display:flex;justify-content:space-between;gap:10px;margin-top:14px;flex-wrap:wrap}
+
+    /* floating hearts/sparkles */
+    .floaty{
+      position:fixed; left:0; top:0; pointer-events:none;
+      opacity:.60; filter: drop-shadow(0 10px 10px rgba(0,0,0,.25));
+      animation: floatUp linear forwards;
+      z-index:999;
+    }
+    @keyframes floatUp{
+      from{ transform: translate(var(--x), 110vh) rotate(0deg) scale(var(--s)); opacity:0}
+      10%{opacity:.7}
+      to{ transform: translate(calc(var(--x) + var(--dx)), -15vh) rotate(240deg) scale(var(--s)); opacity:0}
+    }
+
+    /* Word search */
+    .ws-grid{
+      display:grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap:6px; max-width:420px; margin: 0 auto;
+      user-select:none;
+    }
+    .cell{
+      aspect-ratio:1/1; display:grid; place-items:center;
+      border-radius:12px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      font-weight:900; cursor:pointer;
+      transition: transform .08s ease, background .15s ease;
+    }
+    .cell:hover{transform:translateY(-1px); background: rgba(255,255,255,.11)}
+    .cell.sel{background: rgba(255,77,166,.20); border-color: rgba(255,77,166,.35)}
+    .cell.good{background: rgba(54,211,153,.18); border-color: rgba(54,211,153,.35)}
+
+    /* falling hearts */
+    #fallBox{
+      position:relative;
+      width:min(720px, 100%);
+      height:340px;
+      margin: 0 auto;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      overflow:hidden;
+    }
+    .fallHeart{
+      position:absolute;
+      font-size: 22px;
+      cursor:pointer;
+      user-select:none;
+      filter: drop-shadow(0 10px 10px rgba(0,0,0,.25));
+      animation: fall linear forwards;
+    }
+    @keyframes fall{
+      from{ transform: translateY(-40px); opacity:1}
+      to{ transform: translateY(380px); opacity:0.95}
+    }
+
+    /* emoji match */
+    .matchGrid{
+      display:grid;
+      gap:10px;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      max-width:520px;
+      margin: 0 auto;
+    }
+    .tile{
+      border-radius: 16px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      padding: 14px 10px;
+      text-align:center;
+      cursor:pointer;
+      user-select:none;
+      font-size: 22px;
+      transition: transform .08s ease, background .12s ease;
+    }
+    .tile:hover{ transform: translateY(-1px); background: rgba(255,255,255,.11); }
+    .tile.done{ opacity:.45; cursor:not-allowed; transform:none; }
+
+    /* tap heart */
+    .bigHeart{
+      width: 160px; height: 160px;
+      display:grid; place-items:center;
+      margin: 0 auto;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14);
+      cursor:pointer;
+      user-select:none;
+      box-shadow: 0 18px 40px rgba(0,0,0,.25);
+      transition: transform .08s ease;
+      font-size: 56px;
+    }
+    .bigHeart:active{ transform: scale(0.98); }
+
+    /* cute toast */
+    #toast{
+      position: fixed;
+      left: 50%;
+      bottom: 26px;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(255,255,255,.16);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 999px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+      font-weight: 800;
+      font-size: 14px;
+      opacity: 0;
+      pointer-events: none;
+      backdrop-filter: blur(10px);
+      transition: opacity .18s ease, transform .18s ease;
+      z-index: 9999;
+      white-space: nowrap;
+    }
+    #toast.show{
+      opacity: 1;
+      transform: translateX(-50%) translateY(-6px);
+    }
+    .pop{ animation: pop .18s ease; }
+    @keyframes pop{ from{ transform: scale(.98) } to{ transform: scale(1) } }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="pill"> Screen <span id="screenNum">1</span>/25</div>
+    <div class="pill"> Score: <span id="scoreNow">0</span>/100</div>
+    <div class="bar"><div id="progressFill"></div></div>
+  </div>
+  <div class="card" id="app"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* names */
+const BOYFRIEND = "Vihang";
+const YOU = "Mahak";
+
+/* state */
+let STATE = {
+  i: 0,
+  score: 0,
+  answers: {},
+  levelDone: {},
+  levelScoreGiven: {},
+  ws: null,
+  wsSelected: new Set(),
+  tapCount: 0,
+  valentineYes: false
+};
+
+function esc(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function norm(s){ return String(s||"").trim().toLowerCase().replace(/\s+/g," "); }
+
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 1100);
+}
+
+function floatBurst(count=12, set=["","","","","",""]){
+  for(let i=0;i<count;i++){
+    const el = document.createElement("div");
+    el.className="floaty";
+    el.textContent = set[Math.floor(Math.random()*set.length)];
+    el.style.fontSize = (Math.random()*12+14)+"px";
+    el.style.setProperty("--x", Math.floor(Math.random()*100) + "vw");
+    el.style.setProperty("--dx", (Math.random()*40 - 20) + "vw");
+    el.style.setProperty("--s", (Math.random()*0.9 + 0.6).toFixed(2));
+    el.style.animationDuration = (Math.random()*2.1 + 2.2).toFixed(2) + "s";
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 5200);
+  }
+}
+function sparklesBurst(count=12){ floatBurst(count, ["","","","","",""]); }
+
+function shake(){
+  const app = document.getElementById("app");
+  app.classList.add("shake");
+  setTimeout(()=>app.classList.remove("shake"), 280);
+}
+
+function giveScore(levelIndex, pts){
+  if(STATE.levelScoreGiven[levelIndex]) return;
+  STATE.levelScoreGiven[levelIndex] = true;
+  STATE.score = Math.max(0, Math.min(100, STATE.score + pts));
+}
+
+function makeWordSearchGrid(words){
+  const size = 10;
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const grid = Array.from({length:size}, ()=>Array.from({length:size}, ()=>letters[Math.floor(Math.random()*letters.length)]));
+  const dirs = [{dr:0,dc:1},{dr:1,dc:0},{dr:1,dc:1},{dr:-1,dc:1}];
+
+  function tryPlace(word){
+    word = word.toUpperCase().replace(/[^A-Z]/g,"");
+    for(let attempt=0; attempt<120; attempt++){
+      const d = dirs[Math.floor(Math.random()*dirs.length)];
+      const maxR = d.dr === -1 ? size-1 : size-1 - d.dr*(word.length-1);
+      const minR = d.dr === -1 ? (word.length-1) : 0;
+      const maxC = size-1 - d.dc*(word.length-1);
+      const r0 = Math.floor(Math.random()*(maxR - minR + 1)) + minR;
+      const c0 = Math.floor(Math.random()*(maxC + 1));
+
+      // check conflicts
+      let ok = true;
+      for(let i=0;i<word.length;i++){
+        const r = r0 + d.dr*i;
+        const c = c0 + d.dc*i;
+        const cur = grid[r][c];
+        if(cur !== word[i] && cur !== letters[letters.indexOf(cur)]){ /* always true placeholder */ }
+        // allow overwrite always, but if already part of placed word with different letter, fail:
+        if(grid[r][c] !== word[i] && placedMask.has(r*size+c)) { ok=false; break; }
+      }
+      if(!ok) continue;
+
+      const coords = [];
+      for(let i=0;i<word.length;i++){
+        const r = r0 + d.dr*i;
+        const c = c0 + d.dc*i;
+        grid[r][c] = word[i];
+        coords.push(r*size + c);
+      }
+      coords.forEach(id=>placedMask.add(id));
+      placedWords.push({word, coords});
+      return true;
+    }
+    return false;
+  }
+
+  const placedWords = [];
+  const placedMask = new Set();
+
+  // place words (best effort)
+  words.forEach(w => tryPlace(w));
+
+  // union coords
+  const allCoords = new Set();
+  placedWords.forEach(p => p.coords.forEach(c=>allCoords.add(c)));
+
+  return {grid, size, placedWords, allCoords};
+}
+
+/* 25 screens */
+const LEVELS = [
+  { type:"intro" },                          // 1
+  { type:"dateOneTryLock", pts:8 },          // 2
+  { type:"wordsearch1", pts:12 },            // 3 (MAHEK)
+  { type:"freeText", title:"Write anything ", prompt:"", key:"l4" }, // 4
+  { type:"freeText", title:"Where did we first meet?", prompt:"", key:"l5" }, // 5
+  { type:"textStrict", title:"Who proposed first? ", prompt:"", key:"l6", answers:["me"], pts:6 }, // 6
+  { type:"freeText", title:"Special moment ", prompt:"", key:"l7" }, // 7
+  { type:"mcqStrict", pts:10, title:"If Mahak could do one thing…",
+    prompt:"If Mahak got a chance to do one thing without any fear, what would she do?",
+    options:["She will roam around","She will go out of India","She will go on a beach","She will do everything"],
+    correctIndex:3
+  }, // 8
+  { type:"fallingHearts", pts:10, hard:false }, // 9
+  { type:"emojiMatch", pts:10, hard:false },    // 10
+  { type:"freeText", title:"Describe our relationship ", prompt:"", key:"l11" }, // 11
+  { type:"freeText", title:"Our song ", prompt:"", key:"l12" }, // 12
+  { type:"emojiMatch", pts:12, hard:true },     // 13
+  { type:"freeText", title:"Write whatever you feel ", prompt:"", key:"l14" }, // 14
+  { type:"textStrict", title:"Just say yes ", prompt:"", key:"l15", answers:["yes"], pts:4 }, // 15
+  { type:"letter", title:"For you ", text:`Vihang… I won’t say too much (because you’ll get a big head ). But you matter to me a lot. You’re my comfort and my chaos and my calm.` }, //16
+  { type:"letter", title:"One more ", text:`I don’t want perfect. I want us. Also… stop being cute. It’s distracting.` }, //17
+  { type:"tapHeartExact", pts:10, target:22 }, //18 (hint stays as “our date” only)
+  { type:"fallingHearts", pts:10, hard:true }, //19
+  { type:"tapHeartCount", pts:6, target:10 },  //20
+  { type:"wordsearch2", pts:12 },              //21 (VIHANG + MAHAK)
+  { type:"recap" },                             //22
+  { type:"letter", title:"Before the last question ", text:`Okay listen… you came this far, so you’re either smart or scared of me. (Correct: both.)` }, //23
+  { type:"valentine" },                         //24
+  { type:"final" }                              //25
+];
+
+function canGoNext(i){
+  const L = LEVELS[i];
+  if(["intro","freeText","letter","recap","final"].includes(L.type)) return true;
+  if(L.type==="valentine") return !!STATE.valentineYes;
+  return !!STATE.levelDone[i];
+}
+
+function setTopUI(){
+  document.getElementById("screenNum").textContent = String(STATE.i+1);
+  document.getElementById("scoreNow").textContent = String(STATE.score);
+  document.getElementById("progressFill").style.width = Math.round(((STATE.i+1)/25)*100) + "%";
+}
+
+function footerHTML(i){
+  return `
+    <div class="footerBtns">
+      <button class="btn secondary" id="backBtn" ${i===0?'disabled':''}> Back</button>
+      <button class="btn" id="nextBtn">Next </button>
+    </div>
+  `;
+}
+
+function screenHTML(i){
+  const L = LEVELS[i];
+
+  if(L.type==="intro"){
+    return `
+      <div class="center">
+        <div class="tag"></div>
+        <h1>Hello ${esc(BOYFRIEND)} </h1>
+        <p>Ready?</p>
+        <div class="spacer"></div>
+        <div class="row">
+          <button class="btn good" id="startBtn">Yes</button>
+          <button class="btn secondary" id="nopeBtn">No</button>
+        </div>
+      </div>
+    `;
+  }
+
+  if(L.type==="dateOneTryLock"){
+    return `
+      <div>
+        <div class="tag"></div>
+        <h2>When did everything start?</h2>
+        <input id="ans" type="text" placeholder="Type here…" autocomplete="off"/>
+        <div class="spacer"></div>
+        <div class="note" id="msg"></div>
+      </div>
+    `;
+  }
+
+  if(L.type==="wordsearch1"){
+    return `
+      <div class="center">
+        <div class="tag"></div>
+        <h2>Find the most important name in your life</h2>
+        <div id="wsMount"></div>
+        <div class="spacer"></div>
+        <div class="note" id="msg">Hint: it’s not your name.</div>
+        <div class="spacer"></div>
+        <div class="row"><button class="btn secondary" id="wsClear">Clear</button></div>
+      </div>
+    `;
+  }
+
+  if(L.type==="freeText"){
+    return `
+      <div>
+        <div class="tag"></div>
+        <h2>${esc(L.title)}</h2>
+        <textarea id="free" placeholder="Type here…">${esc(STATE.answers[L.key]||"")}</textarea>
+        <div class="spacer"></div>
+        <div class="note">Anything you type is accepted </div>
+      </div>
+    `;
+  }
+
+  if(L.type==="textStrict"){
+    return `
+      <div>
+        <div class="tag"></div>
+        <h2>${esc(L.title)}</h2>
+        <input id="ans" type="text" placeholder="Type here…" autocomplete="off" />
+        <div class="spacer"></div>
+        <div class="note" id="msg"></div>
+      </div>
+    `;
+  }
+
+  if(L.type==="mcqStrict"){
+    const opts = L.options.map((o,idx)=>`
+      <div class="q">
+        <label style="display:flex;gap:10px;align-items:center;cursor:pointer;">
+          <input type="radio" name="mcq" value="${idx}"/>
+          <span><b>${esc(o)}</b></span>
+        </label>
+      </div>
+    `).join("");
+    return `
+      <div>
+        <div class="tag"></div>
+        <h2>${esc(L.title)}</h2>
+        <p>${esc(L.prompt)}</p>
+        <div style="display:grid;gap:8px">${opts}</div>
+        <div class="spacer"></div>
+        <div class="note" id="msg"></div>
+      </div>
+    `;
+  }
+
+  if(L.type==="fallingHearts"){
+    const target = L.hard ? 14 : 10;
+    return `
+      <div class="center">
+        <div class="tag"></div>
+        <h2>Catch the hearts</h2>
+        <div id="fallBox"></div>
+        <div class="spacer"></div>
+        <div class="row">
+          <span class="pill">Caught: <b id="caught">0</b>/${target}</span>
+          <span class="pill">Missed: <b id="missed">0</b></span>
+        </div>
+        <div class="spacer"></div>
+        <div class="note" id="msg"></div>
+      </div>
+    `;
+  }
+
+  if(L.type==="emojiMatch"){
+    return `
+      <div class="center">
+        <div class="tag"></div>
+        <h2>Match the emojis</h2>
+        <div class="spacer"></div>
+        <div class="note" id="msg"></div>
+        <div class="spacer"></div>
+        <div id="matchMount"></div>
+      </div>
+    `;
+  }
+
+  if(L.type==="letter"){
+    return `
+      <div>
+        <div class="tag"></div>
+        <h2>${esc(L.title)}</h2>
+        <div class="q" style="line-height:1.6">${L.text}</div>
+      </div>
+    `;
+  }
+
+  if(L.type==="tapHeartExact"){
+    return `
+      <div class="center">
+        <div class="tag"></div>
+        <h2>Touch the heart __ times</h2>
+        <p class="tiny">Hint: it’s our date.</p>
+        <div class="spacer"></div>
+        <div class="bigHeart" id="tapHeart"></div>
+        <div class="spacer"></div>
+        <div class="pill">Taps: <b id="tapCount">0</b></div>
+        <div class="spacer"></div>
+        <div class="note" id="msg"></div>
+      </div>
+    `;
+  }
+
+  if(L.type==="tapHeartCount"){
+    return `
+      <div class="center">
+        <div class="tag"></div>
+        <h2>Touch the heart.</h2>
+        <div class="spacer"></div>
+        <div class="bigHeart" id="tapHeart"></div>
+        <div class="spacer"></div>
+        <div class="pill"><b id="tapCount">0</b></div>
+        <div class="spacer"></div>
+        <div class="note" id="msg"></div>
+      </div>
+    `;
+  }
+
+  if(L.type==="wordsearch2"){
+    return `
+      <div class="center">
+        <div class="tag"></div>
+        <h2>Find the names that matter</h2>
+        <div id="wsMount"></div>
+        <div class="spacer"></div>
+        <div class="note" id="msg"></div>
+        <div class="spacer"></div>
+        <div class="row"><button class="btn secondary" id="wsClear">Clear</button></div>
+      </div>
+    `;
+  }
+
+  if(L.type==="recap"){
+    return `
+      <div>
+        <div class="tag"></div>
+        <h2>How much do you know her </h2>
+        <div class="q">
+          <p><b>First meet:</b> ${esc(STATE.answers.l5||"(blank)")}</p>
+          <p><b>Relationship:</b> ${esc(STATE.answers.l11||"(blank)")}</p>
+          <p><b>Song:</b> ${esc(STATE.answers.l12||"(blank)")}</p>
+        </div>
+      </div>
+    `;
+  }
+
+  if(L.type==="valentine"){
+    return `
+      <div class="center">
+        <div class="tag"></div>
+        <h1>Will you be my Valentine? </h1>
+        <div class="spacer"></div>
+        <div class="row" style="gap:12px">
+          <button class="btn good" id="yesBtn">Yes </button>
+          <button class="btn bad" id="noBtn">No</button>
+        </div>
+        <div class="spacer"></div>
+        <div class="note" id="msg"></div>
+      </div>
+    `;
+  }
+
+  if(L.type==="final"){
+    return `
+      <div class="center">
+        <div class="tag"></div>
+        <h1>Done </h1>
+        <h2>Score: ${STATE.score}/100</h2>
+        <div class="spacer"></div>
+        <div class="note">
+          Now come here. I want hugs. And attention. And yes, you’re not allowed to say no 
+        </div>
+      </div>
+    `;
+  }
+
+  return `<div class="center"><h2>Loading…</h2></div>`;
+}
+
+/* render (NO LEVEL 2 GLITCH) */
+function render(){
+  setTopUI();
+  const app = document.getElementById("app");
+  app.innerHTML = screenHTML(STATE.i) + footerHTML(STATE.i);
+  attach();
+
+  const nextBtn = document.getElementById("nextBtn");
+  const L = LEVELS[STATE.i];
+
+  nextBtn.disabled = (!canGoNext(STATE.i) || STATE.i===24);
+
+  // Level 2 special: allow clicking Next to CHECK even before unlocked
+  if(L.type === "dateOneTryLock" && !STATE.levelDone[STATE.i]){
+    nextBtn.disabled = false;
+  }
+
+  setTopUI();
+}
+
+function attach(){
+  const i = STATE.i;
+  const L = LEVELS[i];
+  const app = document.getElementById("app");
+
+  document.getElementById("backBtn").onclick = ()=>{
+    if(STATE.i>0){ STATE.i--; floatBurst(6); render(); }
+  };
+
+  // default Next
+  document.getElementById("nextBtn").onclick = ()=>{
+    if(!canGoNext(STATE.i)){ shake(); toast("Not so fast "); return; }
+    if(STATE.i < 24){ STATE.i++; floatBurst(8); render(); }
+  };
+
+  if(L.type==="intro"){
+    document.getElementById("startBtn").onclick = ()=>{
+      STATE.levelDone[i] = true;
+      giveScore(i, 2);
+      toast("Let’s go ");
+      sparklesBurst(16);
+      app.classList.add("pop"); setTimeout(()=>app.classList.remove("pop"), 220);
+      document.getElementById("nextBtn").disabled = false;
+    };
+    document.getElementById("nopeBtn").onclick = ()=>{ shake(); toast("Wrong button "); };
+  }
+
+  /* LEVEL 2 (one chance, flexible, no stuck) */
+  if(L.type==="dateOneTryLock"){
+    const ans = document.getElementById("ans");
+    const msg = document.getElementById("msg");
+    const nextBtn = document.getElementById("nextBtn");
+
+    nextBtn.onclick = ()=>{
+      // already passed -> move on
+      if(STATE.levelDone[i]){
+        STATE.i++; floatBurst(10); render();
+        return;
+      }
+
+      const v = norm(ans.value);
+      const has24 = v.includes("24");
+      const hasMarchOr3 =
+        v.includes("march") ||
+        /\b3\b/.test(v) ||
+        v.includes("/3") || v.includes("-3") ||
+        v.includes("/03") || v.includes("-03");
+
+      if(has24 && hasMarchOr3){
+        STATE.levelDone[i] = true;
+        STATE.answers.l2 = ans.value;
+        giveScore(i, 8);
+        msg.textContent = "";
+        toast("Awww ");
+        sparklesBurst(18);
+        app.classList.add("pop"); setTimeout(()=>app.classList.remove("pop"), 220);
+        // user clicks Next again to proceed (now canGoNext = true)
+      }else{
+        msg.textContent = "";
+        toast("Nope ");
+        shake();
+        ans.disabled = true;
+        nextBtn.disabled = true; // stuck here if wrong (one chance)
+      }
+    };
+    return;
+  }
+
+  /* WORDSEARCH helper */
+  function mountWordSearch(words, solvedToast){
+    STATE.ws = makeWordSearchGrid(words);
+    STATE.wsSelected = new Set();
+
+    const mount = document.getElementById("wsMount");
+    mount.innerHTML = `
+      <div class="ws-grid" id="wsGrid"></div>
+      <div class="spacer"></div>
+      <div class="tiny">Selected: <span id="selStr">—</span></div>
+    `;
+    const gridEl = document.getElementById("wsGrid");
+    const selStr = document.getElementById("selStr");
+    const msg = document.getElementById("msg");
+    const nextBtn = document.getElementById("nextBtn");
+    nextBtn.disabled = true;
+
+    const flat = STATE.ws.grid.flat();
+    flat.forEach((ch, id)=>{
+      const d = document.createElement("div");
+      d.className="cell";
+      d.textContent=ch;
+
+      d.onclick = ()=>{
+        if(STATE.wsSelected.has(id)){
+          STATE.wsSelected.delete(id);
+          d.classList.remove("sel");
+        }else{
+          STATE.wsSelected.add(id);
+          d.classList.add("sel");
+        }
+
+        const s = [...STATE.wsSelected]
+          .slice(0,20)
+          .map(k => STATE.ws.grid[Math.floor(k/STATE.ws.size)][k%STATE.ws.size])
+          .join("");
+        selStr.textContent = s || "—";
+
+        const ok = [...STATE.ws.allCoords].every(c => STATE.wsSelected.has(c));
+        if(ok){
+          STATE.levelDone[i] = true;
+          giveScore(i, L.pts || 0);
+          msg.textContent = "";
+          toast(solvedToast);
+          sparklesBurst(18);
+          app.classList.add("pop"); setTimeout(()=>app.classList.remove("pop"), 220);
+          nextBtn.disabled = false;
+
+          // mark found letters
+          [...gridEl.children].forEach((node,k)=>{
+            if(STATE.ws.allCoords.has(k)) node.classList.add("good");
+          });
+        }
+      };
+
+      gridEl.appendChild(d);
+    });
+
+    document.getElementById("wsClear").onclick = ()=>{
+      STATE.wsSelected.clear();
+      [...gridEl.children].forEach(n=>n.classList.remove("sel","good"));
+      selStr.textContent="—";
+      document.getElementById("nextBtn").disabled = !STATE.levelDone[i];
+    };
+  }
+
+  /* LEVEL 3 (MAHEK) */
+  if(L.type==="wordsearch1"){
+    mountWordSearch(["MAHEK"], "Found it ");
+    return;
+  }
+
+  /* FREE TEXT */
+  if(L.type==="freeText"){
+    const ta = document.getElementById("free");
+    ta.oninput = ()=> { STATE.answers[L.key] = ta.value; };
+    STATE.levelDone[i] = true;
+    document.getElementById("nextBtn").disabled = false;
+    return;
+  }
+
+  /* STRICT TEXT (no visible hints) */
+  if(L.type==="textStrict"){
+    const ans = document.getElementById("ans");
+    const msg = document.getElementById("msg");
+    const nextBtn = document.getElementById("nextBtn");
+
+    nextBtn.disabled = true;
+    ans.oninput = ()=>{
+      const v = norm(ans.value);
+      const ok = (L.answers||[]).map(norm).includes(v);
+      nextBtn.disabled = !ok;
+    };
+
+    nextBtn.onclick = ()=>{
+      const v = norm(ans.value);
+      const ok = (L.answers||[]).map(norm).includes(v);
+      if(ok){
+        STATE.levelDone[i] = true;
+        STATE.answers[L.key] = ans.value;
+        giveScore(i, L.pts || 0);
+        msg.textContent = "";
+        toast("Good ");
+        sparklesBurst(14);
+        app.classList.add("pop"); setTimeout(()=>app.classList.remove("pop"), 220);
+        STATE.i++; render();
+      }else{
+        msg.textContent = "";
+        toast("Nope ");
+        shake();
+      }
+    };
+    return;
+  }
+
+  /* MCQ */
+  if(L.type==="mcqStrict"){
+    const nextBtn = document.getElementById("nextBtn");
+    nextBtn.disabled = true;
+
+    document.querySelectorAll('input[name="mcq"]').forEach(r=>{
+      r.onchange = ()=>{
+        const val = Number(document.querySelector('input[name="mcq"]:checked').value);
+        nextBtn.disabled = (val !== L.correctIndex);
+      };
+    });
+
+    nextBtn.onclick = ()=>{
+      STATE.levelDone[i] = true;
+      giveScore(i, L.pts || 0);
+      toast("Smart boy ");
+      sparklesBurst(14);
+      app.classList.add("pop"); setTimeout(()=>app.classList.remove("pop"), 220);
+      STATE.i++; render();
+    };
+    return;
+  }
+
+  /* Falling hearts */
+  if(L.type==="fallingHearts"){
+    const box = document.getElementById("fallBox");
+    const caughtEl = document.getElementById("caught");
+    const missedEl = document.getElementById("missed");
+    const nextBtn = document.getElementById("nextBtn");
+
+    const target = L.hard ? 14 : 10;
+    nextBtn.disabled = true;
+
+    let caught = 0, missed = 0;
+    caughtEl.textContent = "0";
+    missedEl.textContent = "0";
+
+    let alive = true;
+
+    function spawn(){
+      if(!alive) return;
+      const h = document.createElement("div");
+      h.className = "fallHeart";
+      h.textContent = Math.random() < 0.88 ? "" : "";
+      h.style.left = (Math.random()* (box.clientWidth - 30)) + "px";
+      const dur = (L.hard ? (1.5 + Math.random()*1.0) : (2.1 + Math.random()*1.3));
+      h.style.animationDuration = dur + "s";
+
+      h.onclick = ()=>{
+        if(h.textContent===""){
+          caught++;
+          caughtEl.textContent = String(caught);
+          floatBurst(2);
+          h.remove();
+          if(caught >= target){
+            STATE.levelDone[i] = true;
+            giveScore(i, L.pts || 0);
+            toast("Nice ");
+            sparklesBurst(10);
+            nextBtn.disabled = false;
+          }
+        }else{
+          missed++;
+          missedEl.textContent = String(missed);
+          shake();
+          h.remove();
+        }
+      };
+
+      box.appendChild(h);
+
+      setTimeout(()=>{
+        if(h.isConnected){
+          if(h.textContent===""){
+            missed++;
+            missedEl.textContent = String(missed);
+          }
+          h.remove();
+        }
+      }, dur*1000);
+
+      setTimeout(spawn, L.hard ? 420 : 560);
+    }
+
+    spawn();
+
+    // stop when leaving
+    const oldNext = nextBtn.onclick;
+    nextBtn.onclick = ()=>{
+      if(!canGoNext(i)){ shake(); toast("Not yet "); return; }
+      alive = false;
+      oldNext();
+    };
+    const backBtn = document.getElementById("backBtn");
+    const oldBack = backBtn.onclick;
+    backBtn.onclick = ()=>{
+      alive = false;
+      oldBack();
+    };
+    return;
+  }
+
+  /* Emoji match */
+  if(L.type==="emojiMatch"){
+    const mount = document.getElementById("matchMount");
+    const nextBtn = document.getElementById("nextBtn");
+    nextBtn.disabled = true;
+
+    const base = L.hard ? ["","","","","","","",""] : ["","","","","",""];
+    const pairs = [];
+    base.forEach(e=>{ pairs.push(e,e); });
+
+    for(let j=pairs.length-1;j>0;j--){
+      const k = Math.floor(Math.random()*(j+1));
+      [pairs[j],pairs[k]] = [pairs[k],pairs[j]];
+    }
+
+    let first = null, lock = false, donePairs = 0;
+    mount.innerHTML = `<div class="matchGrid" id="mg"></div>`;
+    const mg = document.getElementById("mg");
+
+    pairs.forEach((emoji)=>{
+      const t = document.createElement("div");
+      t.className="tile";
+      t.textContent="";
+      t.dataset.emoji = emoji;
+      t.dataset.open = "0";
+      t.onclick = ()=>{
+        if(lock) return;
+        if(t.classList.contains("done")) return;
+        if(t.dataset.open==="1") return;
+
+        t.textContent = t.dataset.emoji;
+        t.dataset.open="1";
+
+        if(!first){
+          first=t;
+        }else{
+          if(first.dataset.emoji === t.dataset.emoji){
+            first.classList.add("done"); t.classList.add("done");
+            donePairs++;
+            floatBurst(2);
+            first=null;
+            if(donePairs >= pairs.length/2){
+              STATE.levelDone[i] = true;
+              giveScore(i, L.pts || 0);
+              toast("Okayyy ");
+              sparklesBurst(12);
+              nextBtn.disabled = false;
+            }
+          }else{
+            lock=true;
+            setTimeout(()=>{
+              first.textContent=""; t.textContent="";
+              first.dataset.open="0"; t.dataset.open="0";
+              first=null; lock=false;
+              shake();
+            }, L.hard ? 650 : 800);
+          }
+        }
+      };
+      mg.appendChild(t);
+    });
+    return;
+  }
+
+  /* Tap heart exact (22) */
+  if(L.type==="tapHeartExact"){
+    const heart = document.getElementById("tapHeart");
+    const countEl = document.getElementById("tapCount");
+    const msg = document.getElementById("msg");
+    const nextBtn = document.getElementById("nextBtn");
+    const target = L.target;
+
+    STATE.tapCount = 0;
+    countEl.textContent = "0";
+    nextBtn.disabled = true;
+
+    heart.onclick = ()=>{
+      STATE.tapCount++;
+      countEl.textContent = String(STATE.tapCount);
+      floatBurst(1);
+
+      if(STATE.tapCount === target){
+        STATE.levelDone[i] = true;
+        giveScore(i, L.pts || 0);
+        msg.textContent = "";
+        toast("Perfect ");
+        sparklesBurst(16);
+        app.classList.add("pop"); setTimeout(()=>app.classList.remove("pop"), 220);
+        nextBtn.disabled = false;
+      }else if(STATE.tapCount > target){
+        msg.textContent = "";
+        toast("Again ");
+        shake();
+        STATE.tapCount = 0;
+        countEl.textContent = "0";
+      }
+    };
+    return;
+  }
+
+  /* Tap heart count (10) — no glitch */
+  if(L.type==="tapHeartCount"){
+    const heart = document.getElementById("tapHeart");
+    const countEl = document.getElementById("tapCount");
+    const nextBtn = document.getElementById("nextBtn");
+    const target = L.target;
+
+    STATE.tapCount = 0;
+    countEl.textContent = "0";
+    nextBtn.disabled = true;
+
+    heart.onclick = ()=>{
+      STATE.tapCount++;
+      countEl.textContent = String(STATE.tapCount);
+      floatBurst(1);
+
+      if(STATE.tapCount >= target){
+        STATE.levelDone[i] = true;
+        giveScore(i, L.pts || 0);
+        toast("Cute ");
+        sparklesBurst(10);
+        nextBtn.disabled = false;
+      }
+    };
+    return;
+  }
+
+  /* WORDSEARCH 2 (VIHANG + MAHAK) */
+  if(L.type==="wordsearch2"){
+    mountWordSearch(["VIHANG","MAHAK"], "Both ");
+    return;
+  }
+
+  /* Valentine */
+  if(L.type==="valentine"){
+    const nextBtn = document.getElementById("nextBtn");
+    nextBtn.disabled = true;
+
+    const yes = document.getElementById("yesBtn");
+    const no = document.getElementById("noBtn");
+
+    yes.onclick = ()=>{
+      STATE.valentineYes = true;
+      toast("Good choice ");
+      sparklesBurst(24);
+      nextBtn.disabled = false;
+    };
+
+    function dodge(){
+      shake();
+      floatBurst(6);
+      no.textContent = "Not allowed ";
+      no.style.transform = `translate(${(Math.random()*220-110)}px, ${(Math.random()*80-40)}px)`;
+      setTimeout(()=>{ no.textContent="No"; }, 800);
+      toast("Nope ");
+    }
+    no.addEventListener("mouseenter", dodge);
+    no.addEventListener("click", (e)=>{ e.preventDefault(); dodge(); });
+    return;
+  }
+}
+
+render();
+setTimeout(()=>sparklesBurst(10), 450);
+</script>
+</body>
+</html>
